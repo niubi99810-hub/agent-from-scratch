@@ -1,5 +1,7 @@
 # agent-from-scratch
 
+![ci](https://github.com/niubi99810-hub/agent-from-scratch/actions/workflows/ci.yml/badge.svg)
+
 一个**零第三方依赖**的 ReAct + function calling Agent 运行时，纯标准库实现，核心不到 400 行。
 
 写它的目的只有一个：让你能把「**模型 → 工具调用 → 观测 → 再决策**」这个循环的每一步都看清、改掉、并在面试白板上默写出来。框架会把这段逻辑藏在 `AgentExecutor` 后面，而面试官恰好最爱问这段。
@@ -15,6 +17,14 @@
 ```bash
 cp .env.example .env          # 改 base_url / model，key 可写在这里或走环境变量
 python agent.py "列出当前目录的文件，并计算 (12+8)*3 等于多少"
+```
+
+Windows 用户可以直接用仓库自带的脚本（会自动定位本机安装的 Python 3.10）：
+
+```bat
+run.cmd "列出当前目录的文件，并计算 (12+8)*3 等于多少"
+test.cmd
+```
 ```
 
 想换成 DeepSeek / 本地 vLLM / 其他兼容端点，只要改 `.env` 里的 `OPENAI_BASE_URL` 和 `MODEL`。

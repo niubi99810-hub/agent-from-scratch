@@ -99,7 +99,12 @@ class DispatchTests(unittest.TestCase):
         def boom() -> str:
             raise ValueError("boom")
 
-        tool = Tool(name="boom", description="always fails", parameters={"type": "object"}, run=boom)
+        tool = Tool(
+            name="boom",
+            description="always fails",
+            parameters={"type": "object"},
+            run=boom,
+        )
         result = dispatch_tool([tool], "boom", "{}")
         self.assertEqual(result, "ERROR: ValueError: boom")
 

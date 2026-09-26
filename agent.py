@@ -22,8 +22,9 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Protocol, Sequence
+from typing import Any, Protocol
 
 # --------------------------------------------------------------------------
 # Local config: read `.env` next to this file so the project runs with no
@@ -179,7 +180,10 @@ def default_tools() -> list[Tool]:
             parameters={
                 "type": "object",
                 "properties": {
-                    "path": {"type": "string", "description": "Directory relative to the workspace."},
+                    "path": {
+                        "type": "string",
+                        "description": "Directory relative to the workspace.",
+                    },
                     "pattern": {"type": "string", "description": "Glob pattern, defaults to '*'."},
                 },
                 "required": [],
@@ -193,8 +197,14 @@ def default_tools() -> list[Tool]:
             parameters={
                 "type": "object",
                 "properties": {
-                    "path": {"type": "string", "description": "File path relative to the workspace."},
-                    "max_bytes": {"type": "integer", "description": "Read limit, defaults to 4000."},
+                    "path": {
+                        "type": "string",
+                        "description": "File path relative to the workspace.",
+                    },
+                    "max_bytes": {
+                        "type": "integer",
+                        "description": "Read limit, defaults to 4000.",
+                    },
                 },
                 "required": ["path"],
                 "additionalProperties": False,
@@ -272,7 +282,8 @@ class OpenAICompatibleClient:
     ) -> None:
         self.model = model or os.environ.get("MODEL", DEFAULT_MODEL)
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        self.base_url = (base_url or os.environ.get("OPENAI_BASE_URL", DEFAULT_BASE_URL)).rstrip("/")
+        resolved_base_url = base_url or os.environ.get("OPENAI_BASE_URL", DEFAULT_BASE_URL)
+        self.base_url = resolved_base_url.rstrip("/")
         self.temperature = temperature
         self.timeout = timeout
         if not self.api_key:
@@ -423,7 +434,8 @@ class Agent:
                 if signature in seen_calls:
                     observation = (
                         f"ERROR: you already called '{name}' with these exact arguments. "
-                        "Do not repeat it - use the earlier observation or try a different approach."
+                        "Do not repeat it - use the earlier observation or "
+                        "try a different approach."
                     )
                 else:
                     seen_calls.add(signature)
@@ -433,7 +445,12 @@ class Agent:
                     {"role": "tool", "tool_call_id": call["id"], "content": observation}
                 )
                 self._record(
-                    Step(index=index, tool=name, arguments=parsed_arguments, observation=observation)
+                    Step(
+                        index=index,
+                        tool=name,
+                        arguments=parsed_arguments,
+                        observation=observation,
+                    )
                 )
 
         final = f"ERROR: stopped after {self.max_steps} steps without a final answer."
