@@ -1,0 +1,1 @@
+"""Test package (kept importable so `discover -s tests -t .` works)."""
